@@ -546,12 +546,12 @@ bool list_remove(list *listToRemoveFrom, int index, void **dataOut)
       return pop_back(listToRemoveFrom, dataOut);
     } else {
       node *curr = listToRemoveFrom->head;  
-      for (int i = 0; i < index - 1; ++i) {
-        curr = curr->next;
+      for (int i = 0; i < index - 2; ++i) {
+        curr = curr->next;  
       }
       *dataOut = curr->next->data;
-      curr->next = curr->next->next;
-      free(curr->next);
+      curr->next = NULL;
+      listToRemoveFrom->tail = curr;
       listToRemoveFrom->size -= 1;
     }
     return true; 
@@ -638,22 +638,6 @@ bool reverse(list *listToReverse)
       curr = temp;
     }
     return true;
-    // list *newList = create_list();
-    // node *newNode = listToReverse->head;
-    // void *data_Out = NULL;
-    // while (newNode) {
-    //   bool success = pop_back(listToReverse, &data_Out);
-    //   if (success) {
-    //     bool isAdded = push_back(newList, data_Out);
-    //     if (!isAdded) {
-    //       free(newList);
-    //       return false;
-    //     }
-    //   }
-    //   newNode = newNode->next;
-    // }
-    // listToReverse = shallow_copy_list(newList);
-    // return true;
 }
 
 /** concat
@@ -682,10 +666,27 @@ bool concat(list *firstList, list *lastList)
     // UNUSED_PARAMETER(firstList);
     // UNUSED_PARAMETER(lastList);
     // return false;
-    if (firstList == NULL || lastList == NULL || firstList->size == 0 
-      || lastList->size == 0) {
-      return false;
+    if (firstList->size == 0 && lastList->size != 0) {
+      firstList->head = lastList->head;
+      firstList->tail = lastList->tail;
+      lastList->head = NULL;
+      lastList->tail = NULL;
+      firstList->size += lastList->size;
+      lastList->size = 0;
+      return true;
     }
+    // if (firstList->size != 0 && lastList->size == 0) {
+    //   firstList = firstList;
+    //   free(firstList);
+    //   return true;
+    // }
+    // if (firstList == 0 && lastList == 0) {
+    //   firstList = firstList;
+    //   lastList = lastList;
+    //   free(firstList);
+    //   free(lastList);
+    //   return false;
+    // }
     firstList->tail->next = lastList->head;
     firstList->tail = lastList->tail;
     lastList->head = NULL;
