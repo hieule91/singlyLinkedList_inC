@@ -257,9 +257,9 @@ bool add(list *listToAddTo, int index, void *data)
       return false;
     }
     if (index == 0) {
-      push_front(listToAddTo, data);
+      return push_front(listToAddTo, data);
     } else if (index == listToAddTo->size - 1) {
-      push_back(listToAddTo, data);
+      return push_back(listToAddTo, data);
     } else {
       node *newNode = create_node(data);
       node *curr = listToAddTo->head;
@@ -341,7 +341,8 @@ bool get(list *listToGetDataFrom, int index, void **dataOut)
     // UNUSED_PARAMETER(dataOut);
     // return false;
     if (dataOut == NULL) { return false; }
-    if (listToGetDataFrom == NULL || listToGetDataFrom->size == 0 ) {
+    if (listToGetDataFrom == NULL || listToGetDataFrom->size == 0
+      || index < 0 || index == listToGetDataFrom->size) {
       *dataOut = NULL;
       return false;
     }
@@ -490,20 +491,27 @@ bool pop_back(list *listToPopFrom, void **dataOut)
       *dataOut = NULL;
       return false;
     }
-    *dataOut = listToPopFrom->tail->data;
     if (listToPopFrom->size == 1) {
-      free(listToPopFrom->tail);
+      // free(listToPopFrom->tail);
+      *dataOut = listToPopFrom->head->data;
       listToPopFrom->head = NULL;
       listToPopFrom->tail = NULL;
     } else {
-      node *curr = listToPopFrom->head; 
-      for (int i = 0; i < listToPopFrom->size - 2; ++i) {
-        curr = curr->next;
+      node *curr = listToPopFrom->head;
+      // node *newTail = NULL;
+      if (listToPopFrom->size == 2) {
+        *dataOut = listToPopFrom->head->next->data;
+        curr->next = NULL;
+        listToPopFrom->tail = curr;
+      } else {
+        for (int i = 0; i < listToPopFrom->size - 2; ++i) {
+          curr = curr->next;
+        }
+        *dataOut = curr->next->data;
+        curr->next = NULL;
+        listToPopFrom->tail = curr;
+        // free(curr);
       }
-      node *oldTail = curr->next;
-      curr->next = NULL;
-      listToPopFrom->tail = curr;
-      free(oldTail);
     }
     listToPopFrom->size -= 1;
     return true;
@@ -528,7 +536,7 @@ bool list_remove(list *listToRemoveFrom, int index, void **dataOut)
     // return false;
     if (dataOut == NULL) { return false; }
     if (listToRemoveFrom == NULL || listToRemoveFrom->size == 0
-      || index == listToRemoveFrom->size || index < 0) {
+      || index >= listToRemoveFrom->size || index < 0) {
       *dataOut = NULL;
       return false;
     }
