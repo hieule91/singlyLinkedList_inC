@@ -79,7 +79,6 @@ list *create_list(void)
     }
     free(newList);
     return NULL;
-
 }
 
 /** shallow_copy_list
@@ -620,7 +619,17 @@ bool reverse(list *listToReverse)
 
     if (listToReverse == NULL) {
       return false;
-    } 
+    }
+    listToReverse->tail = listToReverse->head;
+    node *curr = listToReverse->head;
+    listToReverse->head = NULL;
+    while (curr != NULL) {
+      node *temp = curr->next;
+      curr->next = listToReverse->head;
+      listToReverse->head = curr;
+      curr = temp;
+    }
+    return true;
     // list *newList = create_list();
     // node *newNode = listToReverse->head;
     // void *data_Out = NULL;
@@ -637,17 +646,6 @@ bool reverse(list *listToReverse)
     // }
     // listToReverse = shallow_copy_list(newList);
     // return true;
-
-    listToReverse->tail = listToReverse->head;
-    node *curr = listToReverse->head;
-    listToReverse->head = NULL;
-    while (curr != NULL) {
-      node *temp = curr->next;
-      curr->next = listToReverse->head;
-      listToReverse->head = curr;
-      curr = temp;
-    }
-    return true;
 }
 
 /** concat
